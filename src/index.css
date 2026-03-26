@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-slate-50 text-gray-800 antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-violet-600 text-white text-sm font-semibold rounded-xl hover:bg-violet-700 active:scale-95 transition-all duration-150 shadow-sm;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-violet-300 text-violet-600 text-sm font-semibold rounded-xl hover:bg-violet-50 active:scale-95 transition-all duration-150;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 text-gray-500 text-sm rounded-xl hover:border-gray-300 hover:bg-gray-50 active:scale-95 transition-all duration-150;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm;
+  }
+  .input {
+    @apply w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-gray-50 transition-all;
+  }
+  .page-wrapper {
+    @apply max-w-2xl mx-auto px-4 py-10;
+  }
+  .section-title {
+    @apply text-sm font-semibold text-gray-500 uppercase tracking-wider;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Mood Themes (healing/opposite colors to lift the user's mood) ───────── */
+
+/* SAD → Soft lavender/purple — gentle & comforting */
+body.mood-sad {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #c4b5fd 100%);
+  --mood-accent:       #8b5cf6;
+  --mood-accent-light: #ede9fe;
+  --mood-accent-text:  #4c1d95;
+  --mood-nav:          rgba(245,243,255,0.88);
+  --mood-card:         #faf8ff;
+}
+
+/* STRESSED → Soft mint/teal — calm & breathable */
+body.mood-stressed {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #a7f3d0 100%);
+  --mood-accent:       #10b981;
+  --mood-accent-light: #d1fae5;
+  --mood-accent-text:  #064e3b;
+  --mood-nav:          rgba(240,253,244,0.88);
+  --mood-card:         #f0fdf8;
+}
+
+/* ANXIOUS → Gentle peach/rose — warm & soothing */
+body.mood-anxious {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%);
+  --mood-accent:       #fb7185;
+  --mood-accent-light: #ffe4e6;
+  --mood-accent-text:  #881337;
+  --mood-nav:          rgba(255,241,242,0.88);
+  --mood-card:         #fff5f6;
+}
+
+/* BORED → Electric cyan/teal — vibrant & attention-grabbing */
+body.mood-bored {
+  background: linear-gradient(135deg, #ecfeff 0%, #a5f3fc 50%, #22d3ee 100%);
+  --mood-accent:       #06b6d4;
+  --mood-accent-light: #cffafe;
+  --mood-accent-text:  #164e63;
+  --mood-nav:          rgba(236,254,255,0.88);
+  --mood-card:         #f0feff;
+}
+
+/* HAPPY → Golden celebration — amplify the joy */
+body.mood-happy {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef9c3 50%, #fde68a 100%);
+  --mood-accent:       #eab308;
+  --mood-accent-light: #fef9c3;
+  --mood-accent-text:  #713f12;
+  --mood-nav:          rgba(255,251,235,0.88);
+  --mood-card:         #fffdf0;
+}
+
+/* MOTIVATED → Bold red/orange — energetic & powerful */
+body.mood-motivated {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fb923c 100%);
+  --mood-accent:       #ea580c;
+  --mood-accent-light: #ffedd5;
+  --mood-accent-text:  #7c2d12;
+  --mood-nav:          rgba(255,247,237,0.88);
+  --mood-card:         #fffaf5;
+}
+
+/* NEUTRAL → Fresh sky blue — clear & refreshing */
+body.mood-neutral {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  --mood-accent:       #3b82f6;
+  --mood-accent-light: #dbeafe;
+  --mood-accent-text:  #1e3a8a;
+  --mood-nav:          rgba(239,246,255,0.88);
+  --mood-card:         #f5f9ff;
+}
+
+/* Apply mood variables to shared components */
+body[class*="mood-"] .card {
+  background-color: var(--mood-card, white);
+}
+
+body[class*="mood-"] nav {
+  background-color: var(--mood-nav, rgba(255,255,255,0.8)) !important;
+}
+
+body[class*="mood-"] .btn-primary {
+  background-color: var(--mood-accent, #7c3aed);
+}
+
+body[class*="mood-"] .btn-primary:hover {
+  filter: brightness(0.9);
+}
+
+body[class*="mood-"] .btn-outline {
+  border-color: var(--mood-accent, #7c3aed);
+  color: var(--mood-accent, #7c3aed);
+}
+
+body[class*="mood-"] .input:focus {
+  border-color: var(--mood-accent, #7c3aed);
+  box-shadow: 0 0 0 3px var(--mood-accent-light, #ede9fe);
+}
