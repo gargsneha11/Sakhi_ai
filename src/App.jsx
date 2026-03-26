@@ -29,10 +29,9 @@ function AnimatedRoutes() {
         transition={{ duration: 0.25 }}
       >
         <Routes location={location}>
-          <Route path="/"    element={<Navigate to="/login" replace />} />
-           <Route path="/login"   element={<Login />} />
+          <Route path="/login"    element={<Login />} />
           <Route path="/signup"   element={<Signup />} />
-            <Route path="/home"     element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/"         element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/chatbot"  element={<ProtectedRoute><Chatbot /></ProtectedRoute>} />
           <Route path="/quiz"     element={<ProtectedRoute><Quiz /></ProtectedRoute>} />
           <Route path="/mood"     element={<ProtectedRoute><MoodBooster /></ProtectedRoute>} />
@@ -40,7 +39,7 @@ function AnimatedRoutes() {
           <Route path="/wellness" element={<ProtectedRoute><WellnessZone /></ProtectedRoute>} />
           <Route path="/goals"    element={<ProtectedRoute><StudyGoals /></ProtectedRoute>} />
           <Route path="/roadmap"  element={<ProtectedRoute><Roadmap /></ProtectedRoute>} />
-          <Route path="*"         element={<Navigate to="/login" replace />} />
+          <Route path="*"         element={<Navigate to="/" replace />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
