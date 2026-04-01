@@ -420,6 +420,9 @@ def delete_roadmap(roadmap_id):
 def get_mood(email):
     return jsonify({'mood': 'neutral'})
 
+@app.route('/')
+def home():
+    return "Sakhi AI backend is running successfully"
 # ─── Run ──────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
