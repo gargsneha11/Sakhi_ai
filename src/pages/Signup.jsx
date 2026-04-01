@@ -29,7 +29,9 @@ export default function Signup() {
 
         {/* Header */}
         <div className="text-center">
-          <div className="w-14 h-14 bg-violet-100 rounded-2xl flex items-center justify-center text-2xl mx-auto">🌸</div>
+          <div className="w-14 h-14 rounded-full overflow-hidden mx-auto">
+            <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover" />
+          </div>
           <h1 className="mt-4 text-2xl font-bold text-gray-800">Create your account</h1>
           <p className="text-sm text-gray-400 mt-1">Join Sakhi and start learning smarter</p>
         </div>

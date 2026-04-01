@@ -36,10 +36,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-base shadow"
-                style={{ background: 'var(--mood-accent, #7c3aed)' }}>
-                <img src="/logo.png" alt="Sakhi" className="w-9 h-9 rounded-xl object-cover" />
-              </div>
+              <img src="/logo.png" alt="Sakhi" className="w-9 h-9 rounded-full object-cover" />
               <span className="text-lg font-bold" style={{ color: 'var(--mood-accent, #7c3aed)' }}>Sakhi</span>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed max-w-[180px]">

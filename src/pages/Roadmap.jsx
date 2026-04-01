@@ -4,6 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { apiGenerateRoadmapAI, apiSaveRoadmap, apiGetRoadmaps, apiDeleteRoadmap } from '../utils/api'
 import { useAuth } from '../context/AuthContext'
 
+// ── Mood config for roadmap ───────────────────────────────────────────────────
+const MOOD_ROADMAP = {
+  stressed:  { emoji: '😤', label: 'Stressed',  message: '💙 Keeping it simple — short focused roadmap with easy steps.',       style: 'beginner-friendly, short, simple steps, avoid overwhelming content' },
+  tired:     { emoji: '😴', label: 'Tired',     message: '😴 Light roadmap — easy revision-style path for you.',                  style: 'very simple, revision-friendly, minimal steps per stage'             },
+  motivated: { emoji: '🔥', label: 'Motivated', message: '🔥 Full detailed roadmap — let\'s go deep!',                           style: 'detailed, comprehensive, include advanced topics and challenges'      },
+  confused:  { emoji: '😕', label: 'Confused',  message: '🤔 Step-by-step roadmap with clear explanations at each stage.',        style: 'step-by-step, concept-first, explain each topic clearly'             },
+  happy:     { emoji: '😊', label: 'Happy',     message: '😊 Balanced roadmap — fun and engaging learning path!',                style: 'balanced, engaging, mix of theory and practice'                      },
+  sad:       { emoji: '😢', label: 'Sad',       message: '💜 Gentle roadmap — easy and encouraging path forward.',                style: 'gentle, encouraging, easy beginner-friendly steps'                   },
+  anxious:   { emoji: '😰', label: 'Anxious',   message: '🤗 Calm roadmap — small manageable steps, no pressure.',               style: 'small steps, no pressure, very beginner-friendly'                    },
+  neutral:   { emoji: '😐', label: 'Neutral',   message: '📝 Standard balanced roadmap for steady learning.',                    style: 'balanced, standard difficulty, clear progression'                    },
+}
+
 const STAGE_CONFIG = {
   Beginner:     { gradient: 'from-emerald-400 to-teal-500',  light: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', icon: <BookOpen size={15} /> },
   Intermediate: { gradient: 'from-blue-400 to-cyan-500',     light: 'bg-blue-50',    border: 'border-blue-200',   text: 'text-blue-700',   icon: <Zap size={15} />     },
@@ -12,6 +24,8 @@ const STAGE_CONFIG = {
 
 export default function Roadmap() {
   const { user } = useAuth()
+  const mood       = (localStorage.getItem('userMood') || 'neutral').toLowerCase()
+  const moodConfig = MOOD_ROADMAP[mood] || MOOD_ROADMAP.neutral
 
   const [text,       setText]       = useState('')
   const [roadmap,    setRoadmap]    = useState(null)
@@ -78,9 +92,11 @@ export default function Roadmap() {
   const handleGenerate = async () => {
     setError(''); setLoading(true)
     try {
+      // Append mood style instruction to topic so Groq adapts the roadmap
+      const moodHint = `(Style: ${moodConfig.style})`
       const data = mode === 'pdf' && pdfFile
         ? await apiGenerateRoadmapAI(pdfFile)
-        : await apiGenerateRoadmapAI(text.trim())
+        : await apiGenerateRoadmapAI(`${text.trim()} ${moodHint}`)
       if (data.error) setError(data.error)
       else { setRoadmap(data.roadmap); setView('cards') }
     } catch {
@@ -122,6 +138,16 @@ export default function Roadmap() {
             style={{ background: 'var(--mood-accent-light,#ede9fe)' }}>🗺️</div>
           <h1 className="text-3xl font-extrabold text-gray-900">AI Roadmap Generator</h1>
           <p className="text-gray-400 mt-2 text-sm">Type a topic or upload a PDF — AI builds your complete study roadmap</p>
+          {/* Mood badges */}
+          <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full border"
+              style={{ background: 'var(--mood-accent-light,#ede9fe)', color: 'var(--mood-accent-text,#4c1d95)', borderColor: 'var(--mood-accent-light,#ede9fe)' }}>
+              {moodConfig.emoji} Mood: {moodConfig.label}
+            </span>
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+              ✨ Adaptive Roadmap ON
+            </span>
+          </div>
         </div>
       </div>
 
@@ -133,6 +159,16 @@ export default function Roadmap() {
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
 
             <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl p-6 shadow-sm flex flex-col gap-5">
+
+              {/* Mood message banner */}
+              <div className="flex items-start gap-3 px-4 py-3.5 rounded-2xl border"
+                style={{ background: 'var(--mood-accent-light,#ede9fe)', borderColor: 'var(--mood-accent-light,#ede9fe)', color: 'var(--mood-accent-text,#4c1d95)' }}>
+                <span className="text-xl shrink-0">{moodConfig.emoji}</span>
+                <div>
+                  <p className="text-xs font-bold mb-0.5">Adaptive Roadmap Mode</p>
+                  <p className="text-xs opacity-80">{moodConfig.message}</p>
+                </div>
+              </div>
 
               {/* Mode toggle */}
               <div className="flex gap-1 bg-gray-100 p-1 rounded-2xl">
@@ -213,7 +249,13 @@ export default function Roadmap() {
             <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl px-6 py-5 shadow-sm flex items-center justify-between flex-wrap gap-3">
               <div>
                 <h2 className="text-xl font-extrabold text-gray-800">{roadmap.title}</h2>
-                <p className="text-xs text-gray-400 mt-0.5 italic truncate max-w-xs">{roadmap.input_topic}</p>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <p className="text-xs text-gray-400 italic truncate max-w-xs">{roadmap.input_topic}</p>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+                    style={{ background: 'var(--mood-accent-light,#ede9fe)', color: 'var(--mood-accent-text,#4c1d95)', borderColor: 'var(--mood-accent-light,#ede9fe)' }}>
+                    {moodConfig.emoji} {moodConfig.label}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">

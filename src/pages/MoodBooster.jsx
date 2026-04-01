@@ -14,7 +14,22 @@ const TABS = [
   { id: 'words',     label: '📝 Words',     desc: 'Unscramble words for a quick brain boost' },
 ]
 
-const BREAK_SECONDS = 10 * 60 // 10 minutes
+const DAILY_SECONDS = 20 * 60 // 20 minutes total per day
+const STORAGE_KEY   = 'sakhi-moodbooster-time'
+
+function todayKey() { return new Date().toISOString().slice(0, 10) }
+
+function getRemainingSeconds() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    if (saved.date === todayKey()) return saved.remaining
+  } catch {}
+  return DAILY_SECONDS // fresh day — full 20 min
+}
+
+function saveRemainingSeconds(secs) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: todayKey(), remaining: secs }))
+}
 
 function pad(n) { return String(n).padStart(2, '0') }
 
@@ -23,30 +38,38 @@ export default function MoodBooster() {
   const { user }                = useAuth()
   const { isMoodBoosterBlocked } = usePomodoro()
 
-  const [seconds,  setSeconds]  = useState(BREAK_SECONDS)
-  const [showPopup, setShowPopup] = useState(false)
+  const [seconds,    setSeconds]    = useState(() => getRemainingSeconds())
+  const [showPopup,  setShowPopup]  = useState(false)
+  const [allUsed,    setAllUsed]    = useState(() => getRemainingSeconds() <= 0)
   const intervalRef = useRef(null)
 
-  // Start 10-min timer automatically when page loads
+  // Start timer automatically, counting down from remaining seconds
   useEffect(() => {
-    setSeconds(BREAK_SECONDS)
+    const remaining = getRemainingSeconds()
+    if (remaining <= 0) { setAllUsed(true); return }
+
+    setSeconds(remaining)
     setShowPopup(false)
+
     intervalRef.current = setInterval(() => {
       setSeconds(prev => {
-        if (prev <= 1) {
+        const next = prev - 1
+        saveRemainingSeconds(next)   // save every second
+        if (next <= 0) {
           clearInterval(intervalRef.current)
           setShowPopup(true)
+          setAllUsed(true)
           return 0
         }
-        return prev - 1
+        return next
       })
     }, 1000)
     return () => clearInterval(intervalRef.current)
   }, [])
 
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  const progress = ((BREAK_SECONDS - seconds) / BREAK_SECONDS) * 100
+  const mins     = Math.floor(seconds / 60)
+  const secs     = seconds % 60
+  const progress = ((DAILY_SECONDS - seconds) / DAILY_SECONDS) * 100
 
   if (isMoodBoosterBlocked) {
     return (
@@ -80,9 +103,9 @@ export default function MoodBooster() {
           >
             <div className="bg-white rounded-3xl p-8 max-w-sm w-full flex flex-col items-center gap-4 text-center shadow-2xl">
               <div className="text-5xl">⏰</div>
-              <h2 className="text-xl font-extrabold text-gray-800">Break's Over!</h2>
+              <h2 className="text-xl font-extrabold text-gray-800">Daily Break Used Up!</h2>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Your 10-minute break is done. Time to get back to work! You've got this 💪
+                You've used your full <strong>20-minute</strong> daily Mood Booster time. Come back tomorrow for a fresh 20 minutes! 🌟
               </p>
               <button
                 onClick={() => setShowPopup(false)}
@@ -103,24 +126,27 @@ export default function MoodBooster() {
         <p className="text-sm text-gray-400 max-w-sm leading-relaxed">Take a short break and refresh your mind</p>
       </div>
 
-      {/* ── 10-min break countdown bar ── */}
+      {/* ── Daily break countdown bar ── */}
       <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm">
-        <div className="text-2xl">{seconds === 0 ? '⏰' : '🌟'}</div>
+        <div className="text-2xl">{allUsed ? '⏰' : '🌟'}</div>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-semibold text-gray-600">Break Timer</span>
-            <span className="text-sm font-extrabold tabular-nums" style={{ color: 'var(--mood-accent,#7c3aed)' }}>
-              {pad(mins)}:{pad(secs)}
+            <span className="text-xs font-semibold text-gray-600">Daily Break Time</span>
+            <span className="text-sm font-extrabold tabular-nums" style={{ color: allUsed ? '#ef4444' : 'var(--mood-accent,#7c3aed)' }}>
+              {allUsed ? 'Used up' : `${pad(mins)}:${pad(secs)}`}
             </span>
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-1000"
-              style={{ width: `${progress}%`, background: 'var(--mood-accent,#7c3aed)' }}
+              style={{ width: `${progress}%`, background: allUsed ? '#ef4444' : 'var(--mood-accent,#7c3aed)' }}
             />
           </div>
           <p className="text-[10px] text-gray-400 mt-1">
-            {seconds > 0 ? `${mins}m ${pad(secs)}s remaining — enjoy your break!` : 'Time\'s up! Head back to work.'}
+            {allUsed
+              ? "You've used all 20 min today. Come back tomorrow! 🌙"
+              : `${pad(mins)}m ${pad(secs)}s of 20 min remaining today`
+            }
           </p>
         </div>
       </div>

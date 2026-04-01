@@ -41,7 +41,7 @@ const ChatWindow = forwardRef(function ChatWindow({ messages, isTyping }, ref) {
         <div className="flex items-end gap-2">
           <div className="w-7 h-7 rounded-full overflow-hidden shrink-0"
             style={{ background: 'var(--mood-accent-light, #ede9fe)' }}>
-            <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover" />
+            <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover rounded-full" />
           </div>
           <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0ms]"   style={{ background: 'var(--mood-accent, #7c3aed)' }} />

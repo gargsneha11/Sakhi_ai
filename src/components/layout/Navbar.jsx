@@ -31,10 +31,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <NavLink to="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base shadow-sm"
-            style={{ background: 'var(--mood-accent, #7c3aed)', color: 'white' }}>
-            <img src="/logo.png" alt="Sakhi" className="w-8 h-8 rounded-xl object-cover" />
-          </div>
+          <img src="/logo.png" alt="Sakhi" className="w-8 h-8 rounded-full object-cover" />
           <span className="text-lg font-bold tracking-tight" style={{ color: 'var(--mood-accent, #7c3aed)' }}>
             Sakhi
           </span>

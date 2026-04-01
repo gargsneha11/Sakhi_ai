@@ -226,7 +226,7 @@ export default function Home() {
                 className="flex items-center gap-2 text-sm font-semibold text-white px-6 py-3 rounded-2xl shadow-md hover:opacity-90 hover:-translate-y-0.5 transition-all"
                 style={{ background: 'var(--mood-accent, #7c3aed)' }}
               >
-                ⏱ Start Focus Session
+                ⏱ Pomodoro
               </button>
             ) : (
               <span className="text-xs font-medium px-4 py-2 rounded-2xl border"

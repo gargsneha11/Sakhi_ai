@@ -136,7 +136,7 @@ function ChatPanel({ storageKey, sessionId, onMessageSent }) {
       {/* Chat header */}
       <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-white/70 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm">
+          <div className="w-9 h-9 rounded-full overflow-hidden shadow-sm">
             <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover" />
           </div>
           <div>

@@ -17,7 +17,7 @@ export default function MessageBubble({ message }) {
         {!isUser && (
           <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 mb-0.5"
             style={{ background: 'var(--mood-accent-light, #ede9fe)' }}>
-            <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover" />
+            <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover rounded-full" />
           </div>
         )}
         <div

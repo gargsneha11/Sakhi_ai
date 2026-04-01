@@ -20,7 +20,7 @@ export default function About() {
     >
       {/* Hero */}
       <div className="text-center">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto overflow-hidden">
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto overflow-hidden">
           <img src="/logo.png" alt="Sakhi" className="w-full h-full object-cover" />
         </div>
         <h1 className="mt-4 text-3xl font-bold text-gray-800">About Sakhi</h1>
