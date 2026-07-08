@@ -11,7 +11,7 @@ from groq import Groq
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['*'])
 
 DB_PATH      = os.path.join(os.path.dirname(__file__), 'sakhi.db')
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
@@ -67,6 +67,9 @@ def extract_pdf_text(raw_bytes):
     return '\n\n'.join(parts)
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
+
+# Initialize DB on startup
+init_db()
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -427,6 +430,6 @@ def home():
 
 if __name__ == '__main__':
     init_db()
-    port = int(os.environ.get("PORT", 10000))
-    print(f"✅ Server running on port {port}")
-    app.run(host="0.0.0.0", port=port)
+    print('✅ Database ready. Starting Flask...')
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
