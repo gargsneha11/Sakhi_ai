@@ -4,3 +4,4 @@ python-dotenv
 groq
 pypdf
 gunicorn
+psycopg2-binary
