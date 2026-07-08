@@ -1,4 +1,4 @@
-const BASE = 'https://sakhi-ai1.onrender.com'   // <-- your live backend
+const BASE = 'https://sakhi-ai-web.onrender.com'   // <-- your live backend
 
 async function post(path, body) {
   const res = await fetch(`${BASE}${path}`, {

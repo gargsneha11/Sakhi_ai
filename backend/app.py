@@ -15,51 +15,83 @@ app = Flask(__name__)
 CORS(app, origins=['*'])
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
+USE_POSTGRES = bool(DATABASE_URL)
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 client       = Groq(api_key=GROQ_API_KEY)
 
 # ─── Database setup ───────────────────────────────────────────────────────────
 
 def get_db():
-    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
-    return conn
+    if USE_POSTGRES:
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    else:
+        import sqlite3
+        DB_PATH = os.path.join(os.path.dirname(__file__), 'sakhi.db')
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+def execute(conn, query, params=()):
+    # Convert %s to ? for SQLite
+    if not USE_POSTGRES:
+        query = query.replace('%s', '?')
+    c = conn.cursor()
+    c.execute(query, params)
+    return c
+
+def fetchall(c):
+    rows = c.fetchall()
+    if USE_POSTGRES:
+        return [dict(r) for r in rows]
+    return [dict(r) for r in rows]
+
+def fetchone(c):
+    row = c.fetchone()
+    if row is None: return None
+    return dict(row)
 
 def init_db():
     conn = get_db()
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id       SERIAL PRIMARY KEY,
-        name     TEXT NOT NULL,
-        email    TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS goals (
-        id               SERIAL PRIMARY KEY,
-        user_email       TEXT NOT NULL,
-        subject          TEXT NOT NULL,
-        exam_name        TEXT,
-        exam_date        TEXT,
-        daily_hours      TEXT,
-        topics           TEXT,
-        completed_topics TEXT,
-        created_at       TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS progress (
-        id                  SERIAL PRIMARY KEY,
-        user_email          TEXT NOT NULL,
-        subject_name        TEXT NOT NULL,
-        completed_topics    INTEGER DEFAULT 0,
-        total_topics        INTEGER DEFAULT 0,
-        progress_percentage REAL DEFAULT 0)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS notes (
-        id         SERIAL PRIMARY KEY,
-        user_email TEXT NOT NULL,
-        note_text  TEXT NOT NULL,
-        created_at TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS roadmaps (
-        id         SERIAL PRIMARY KEY,
-        user_email TEXT NOT NULL,
-        title      TEXT NOT NULL,
-        data       TEXT NOT NULL,
-        saved_at   TEXT NOT NULL)''')
+    if USE_POSTGRES:
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY, name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE, password TEXT NOT NULL)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS goals (
+            id SERIAL PRIMARY KEY, user_email TEXT NOT NULL,
+            subject TEXT NOT NULL, exam_name TEXT, exam_date TEXT,
+            daily_hours TEXT, topics TEXT, completed_topics TEXT, created_at TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS progress (
+            id SERIAL PRIMARY KEY, user_email TEXT NOT NULL,
+            subject_name TEXT NOT NULL, completed_topics INTEGER DEFAULT 0,
+            total_topics INTEGER DEFAULT 0, progress_percentage REAL DEFAULT 0)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS notes (
+            id SERIAL PRIMARY KEY, user_email TEXT NOT NULL,
+            note_text TEXT NOT NULL, created_at TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS roadmaps (
+            id SERIAL PRIMARY KEY, user_email TEXT NOT NULL,
+            title TEXT NOT NULL, data TEXT NOT NULL, saved_at TEXT NOT NULL)''')
+    else:
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS goals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT NOT NULL,
+            subject TEXT NOT NULL, exam_name TEXT, exam_date TEXT,
+            daily_hours TEXT, topics TEXT, completed_topics TEXT, created_at TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS progress (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT NOT NULL,
+            subject_name TEXT NOT NULL, completed_topics INTEGER DEFAULT 0,
+            total_topics INTEGER DEFAULT 0, progress_percentage REAL DEFAULT 0)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT NOT NULL,
+            note_text TEXT NOT NULL, created_at TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS roadmaps (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT NOT NULL,
+            title TEXT NOT NULL, data TEXT NOT NULL, saved_at TEXT NOT NULL)''')
     conn.commit()
     conn.close()
 
